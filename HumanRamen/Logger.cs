@@ -1,6 +1,6 @@
 using System;
 
-namespace InfinityDialogue
+namespace HumanRamen
 {
     public class Logger
     {

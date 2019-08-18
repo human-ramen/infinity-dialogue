@@ -13,7 +13,6 @@ namespace InfinityDialogue
         private World _world;
         private GameContent _content;
 
-
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
