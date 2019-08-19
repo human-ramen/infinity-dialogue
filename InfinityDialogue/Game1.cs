@@ -1,4 +1,6 @@
-﻿using InfinityDialogue.Components;
+﻿using System;
+using HumanRamen;
+using InfinityDialogue.Components;
 using InfinityDialogue.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,9 +8,11 @@ using MonoGame.Extended.Entities;
 
 namespace InfinityDialogue
 {
-    public class Game1 : Game
+    public class Game1 : Game, ICommandHandler
     {
-        private GraphicsDeviceManager _graphics;
+        private readonly GraphicsDeviceManager _graphics;
+        private readonly Commander _commander;
+
         private SpriteBatch _spriteBatch;
         private World _world;
         private GameContent _content;
@@ -16,6 +20,9 @@ namespace InfinityDialogue
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
+            _commander = new Commander();
+            _commander.RegisterHandler("Control", this);
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -27,38 +34,47 @@ namespace InfinityDialogue
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _spriteBatch = new SpriteBatch(_graphics.GraphicsDevice);
             _content = new GameContent(Content);
 
+
             _world = new WorldBuilder()
-                .AddSystem(new RenderSystem(_spriteBatch, _content.BGKitchen))
-                .AddSystem(new DialogueSystem(_spriteBatch, _content.BrandFont))
+                .AddSystem(new ControlSystem(_commander))
+                .AddSystem(new RenderSystem(_spriteBatch, _content))
+                // .AddSystem(new DialogueSystem(_spriteBatch, _content.BrandFont))
+                .AddSystem(new DebugSystem(_content, _commander))
                 .Build();
 
-            var entity = _world.CreateEntity();
-            var queue = new DialogueQueueComponent();
-            queue.Add(new DialogueStateComponent("Hello world!1"));
-            queue.Add(new DialogueStateComponent("What a dialog!"));
-            queue.Add(new DialogueStateComponent("Byeea"));
-            entity.Attach(queue);
+            var env = _world.CreateEntity();
+            var bg = new SpriteComponent(_content.BGKitchen);
+            bg.IsBackground = true;
+            env.Attach(bg);
         }
 
         protected override void Update(GameTime gameTime)
         {
             _world.Update(gameTime);
-
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.WhiteSmoke);
-
-            _spriteBatch.Begin();
             _world.Draw(gameTime);
-            _spriteBatch.End();
-
             base.Draw(gameTime);
+        }
+
+        public void HandleCommand(string topic, string command)
+        {
+            Console.WriteLine(command);
+            if (topic == "Control" && command == "Fullscreen")
+            {
+                _graphics.ToggleFullScreen();
+            }
+
+            if (topic == "Control" && command == "Exit")
+            {
+                Exit();
+            }
         }
     }
 }
