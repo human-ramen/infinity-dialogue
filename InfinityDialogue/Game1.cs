@@ -1,5 +1,4 @@
-﻿using System.Text;
-using HumanRamen;
+﻿using HumanRamen;
 using InfinityDialogue.Components;
 using InfinityDialogue.Systems;
 using Microsoft.Xna.Framework;
@@ -44,18 +43,25 @@ namespace InfinityDialogue
             _world = new WorldBuilder()
                 .AddSystem(new ControlSystem(_luaAdapter, _commander))
                 .AddSystem(new RenderSystem(_spriteBatch, _content))
-                // .AddSystem(new DialogueSystem(_spriteBatch, _content.BrandFont))
+                .AddSystem(new DialogSystem(_graphics.GraphicsDevice, _content, _commander))
                 .AddSystem(new DebugSystem(_content, _commander))
                 .Build();
 
-            var env = _world.CreateEntity();
-            var bg = new SpriteComponent(_content.BGKitchen);
+            var karen = _world.CreateEntity();
+            var sprite = new SpriteComponent(_content.ChrKaren);
+            sprite.Depth = 0.4f;
+            sprite.Position = new Rectangle(150, 30, _content.ChrKaren.Width / 2, _content.ChrKaren.Height / 2);
+            karen.Attach(sprite);
+
+            var gameState = _world.CreateEntity();
+            // TODO: Render layers
+            var bg = new SpriteComponent(_content.BgKitchen);
             bg.IsBackground = true;
-            var title = new SpriteFontComponent(_content.BrandFont);
-            title.Text = new StringBuilder("Hey it's titile");
-            title.Position = new Vector2(100, 100);
-            env.Attach(bg);
-            env.Attach(title);
+            var dialog = new DialogComponent();
+            dialog.Name = "Goosebumps";
+            dialog.Text = "Hello, Sunshine. Maybe some violent rape saves your morning mood?\nI like to jerk off in coffee when nobody watching. Like it?";
+            gameState.Attach(bg);
+            gameState.Attach(dialog);
         }
 
         protected override void Update(GameTime gameTime)

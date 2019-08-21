@@ -31,7 +31,8 @@ namespace InfinityDialogue.Systems
         {
             _spriteBatch.GraphicsDevice.Clear(Color.White);
 
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack,
+                               blendState: BlendState.AlphaBlend);
 
             foreach (var entity in ActiveEntities)
             {
@@ -46,24 +47,27 @@ namespace InfinityDialogue.Systems
         {
             if (sprite == null || !sprite.IsVisible) return;
 
+            // TODO: refactor
             if (sprite.IsBackground)
             {
-                _spriteBatch.Draw(_content.BGKitchen,
+                _spriteBatch.Draw(sprite.Texture,
                                   new Rectangle((int)sprite.Position.X, (int)sprite.Position.Y,
                                                 _spriteBatch.GraphicsDevice.Viewport.Width,
-                                                _spriteBatch.GraphicsDevice.Viewport.Height), sprite.Mask);
+                                                _spriteBatch.GraphicsDevice.Viewport.Height),
+                                  null, sprite.Mask, 0.0f, Vector2.Zero, SpriteEffects.None, 0);
 
                 return;
             }
 
-            _spriteBatch.Draw(_content.BGKitchen, sprite.Position, sprite.Mask);
+            _spriteBatch.Draw(sprite.Texture, sprite.Position, null,
+                              sprite.Mask, 0.0f, Vector2.Zero, SpriteEffects.None, sprite.Depth);
         }
 
         private void drawSpriteFont(SpriteFontComponent spriteFont)
         {
             if (spriteFont == null || !spriteFont.IsVisible) return;
 
-            _spriteBatch.DrawString(spriteFont.SpriteFont, spriteFont.Text, spriteFont.Position, spriteFont.Color);
+            _spriteBatch.DrawString(spriteFont.SpriteFont, spriteFont.Text, spriteFont.Position, spriteFont.Color, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, spriteFont.Depth);
         }
     }
 }

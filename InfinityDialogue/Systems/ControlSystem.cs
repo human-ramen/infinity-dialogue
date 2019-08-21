@@ -23,7 +23,6 @@ namespace InfinityDialogue.Systems
 
             _kbdmap = _luaAdapter.GetControlScheme();
 
-            // TODO parse lua config
             // _kbdmap.Add(Keys.Q, "Exit");
             // _kbdmap.Add(Keys.Space, "Continue");
             // _kbdmap.Add(Keys.F, "Fullscreen");

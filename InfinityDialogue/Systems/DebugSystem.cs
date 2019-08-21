@@ -14,7 +14,7 @@ namespace InfinityDialogue.Systems
         public DebugSystem(GameContent content, Commander commander)
         {
             _commander = commander;
-            _spriteComponent = new SpriteComponent(content.BGKitchen);
+            _spriteComponent = new SpriteComponent(content.BgKitchen);
             _spriteComponent.IsVisible = false;
 
             _commander.RegisterHandler("Control", this);

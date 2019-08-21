@@ -7,9 +7,9 @@ namespace InfinityDialogue.Components
     public class SpriteComponent
     {
         public Texture2D Texture { get; set; }
-        public Vector2 Position { get; set; }
-        public int Scale { get; set; } = 1;
+        public Rectangle Position { get; set; }
         public Color Mask { get; set; } = Color.White;
+        public float Depth { get; set; } = 0.5f;
         public bool IsVisible { get; set; } = true;
         public bool IsBackground { get; set; }
 
@@ -22,11 +22,11 @@ namespace InfinityDialogue.Components
     public class SpriteFontComponent
     {
         public SpriteFont SpriteFont { get; set; }
-        public StringBuilder Text { get; set; }
+        public StringBuilder Text { get; set; } = new StringBuilder();
         public Color Color { get; set; } = Color.Black;
         public Vector2 Position { get; set; }
+        public float Depth { get; set; } = 1;
         public bool IsVisible { get; set; } = true;
-        public bool IsAnimated { get; set; }
 
         public SpriteFontComponent(SpriteFont spriteFont)
         {
