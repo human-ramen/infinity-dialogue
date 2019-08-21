@@ -58,7 +58,7 @@ namespace InfinityDialogue
             var bg = new SpriteComponent(_content.BgKitchen);
             bg.IsBackground = true;
             var dialog = new DialogComponent();
-            dialog.Name = "Goosebumps";
+            dialog.Name = "Karen";
             dialog.Text = "Hello, Sunshine. Maybe some violent rape saves your morning mood?\nI like to jerk off in coffee when nobody watching. Like it?";
             gameState.Attach(bg);
             gameState.Attach(dialog);
