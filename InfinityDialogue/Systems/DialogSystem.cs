@@ -33,6 +33,7 @@ namespace InfinityDialogue.Systems
             _content = content;
             _commander = commander;
 
+            // TODO: move colored texture to palette or something?
             _backgroundSpriteComponent = new UIDialogComponent(new ColoredTexture(_graphic, Color.Black));
             _textNameComponent = new TextNameComponent(content.BrandFont);
             _textDialogComponent = new TextDialogComponent(content.BrandFont);

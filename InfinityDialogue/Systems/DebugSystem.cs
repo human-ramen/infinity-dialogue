@@ -18,6 +18,7 @@ namespace InfinityDialogue.Systems
             _spriteComponent.IsVisible = false;
 
             _commander.RegisterHandler("Control", this);
+            _commander.RegisterHandler("Choice", this);
         }
 
         public override void Initialize(World world)

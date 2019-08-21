@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -76,6 +78,54 @@ namespace InfinityDialogue.Components
         public void CalculatePosition(int width, int height)
         {
             Position = new Vector2(width / 50 + 15, height - height / 4 + 35);
+        }
+    }
+
+    public class TextMenuItemComponent : SpriteFontComponent, ICalculatePosition
+    {
+        public int Order { get; set; }
+
+        public TextMenuItemComponent(SpriteFont spriteFont, int order, string text) : base(spriteFont)
+        {
+            Color = Color.White;
+            Order = order;
+            Text = new StringBuilder(text);
+        }
+
+        // TODO: refactor
+        public void CalculatePosition(int width, int height)
+        {
+            // Good start;
+            var x = width / 50 + 30;
+            var y = height - height / 4 + 15;
+
+            switch (Order)
+            {
+                case 0:
+                    Position = new Vector2(x, y);
+                    break;
+                case 1:
+                    Position = new Vector2(x + 300, y);
+                    break;
+                case 2:
+                    Position = new Vector2(x, y + 40);
+                    break;
+                case 3:
+                    Position = new Vector2(x + 300, y + 40);
+                    break;
+                default:
+                    throw new Exception("Max 4 items, needs refactoring");
+            }
+        }
+    }
+
+    public class TextMenuComponent
+    {
+        public List<TextMenuItemComponent> Items;
+
+        public TextMenuComponent(List<TextMenuItemComponent> items)
+        {
+            Items = items;
         }
     }
 }

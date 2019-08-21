@@ -18,12 +18,14 @@ namespace InfinityDialogue.Systems
         private ComponentMapper<SpriteFontComponent> _spriteFontMapper;
         private ComponentMapper<TextNameComponent> _textNameMapper;
         private ComponentMapper<TextDialogComponent> _textDialogMapper;
+        private ComponentMapper<TextMenuComponent> _textMenuMapper;
         private ComponentMapper<UIDialogComponent> _uiDialogMapper;
 
         // TODO: Maybe refactor all this mess?
         public RenderSystem(SpriteBatch spriteBatch, GameContent content) :
             base(Aspect.One(typeof(SpriteComponent), typeof(SpriteFontComponent),
                             typeof(TextNameComponent), typeof(TextDialogComponent),
+                            typeof(TextMenuComponent),
                             typeof(UIDialogComponent)))
         {
             _spriteBatch = spriteBatch;
@@ -36,6 +38,7 @@ namespace InfinityDialogue.Systems
             _spriteFontMapper = mapperService.GetMapper<SpriteFontComponent>();
             _textNameMapper = mapperService.GetMapper<TextNameComponent>();
             _textDialogMapper = mapperService.GetMapper<TextDialogComponent>();
+            _textMenuMapper = mapperService.GetMapper<TextMenuComponent>();
             _uiDialogMapper = mapperService.GetMapper<UIDialogComponent>();
         }
 
@@ -53,6 +56,16 @@ namespace InfinityDialogue.Systems
             {
                 // TODO: I will hate myself when see this code after a while, but woah! This is beautiful.
                 // Consider switching to F#;
+
+                var textMenu = _textMenuMapper.Get(entity);
+                if (textMenu != null)
+                {
+                    // TODO: Things getting absolute crazy
+                    foreach (var item in textMenu.Items)
+                    {
+                        drawSpriteFont(calculatePosition<TextMenuItemComponent>(item));
+                    }
+                }
 
                 drawSprite(_spriteMapper.Get(entity));
                 drawSprite(calculatePosition<UIDialogComponent>(_uiDialogMapper.Get(entity)));

@@ -7,8 +7,6 @@ namespace InfinityDialogue
 {
     public class LuaAdapter
     {
-        private readonly Lua _lua;
-
         public Dictionary<Keys, string> GetControlScheme()
         {
             var lua = new Lua();

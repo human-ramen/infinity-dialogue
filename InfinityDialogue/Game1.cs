@@ -1,4 +1,5 @@
-﻿using HumanRamen;
+﻿using System.Collections.Generic;
+using HumanRamen;
 using InfinityDialogue.Components;
 using InfinityDialogue.Systems;
 using Microsoft.Xna.Framework;
@@ -44,6 +45,7 @@ namespace InfinityDialogue
                 .AddSystem(new ControlSystem(_luaAdapter, _commander))
                 .AddSystem(new RenderSystem(_spriteBatch, _content))
                 .AddSystem(new DialogSystem(_graphics.GraphicsDevice, _content, _commander))
+                .AddSystem(new ChoiceSystem(_graphics.GraphicsDevice, _content, _commander))
                 .AddSystem(new DebugSystem(_content, _commander))
                 .Build();
 
@@ -57,11 +59,19 @@ namespace InfinityDialogue
             // TODO: Render layers
             var bg = new SpriteComponent(_content.BgKitchen);
             bg.IsBackground = true;
-            var dialog = new DialogComponent();
-            dialog.Name = "Karen";
-            dialog.Text = "Hello, Sunshine. Maybe some violent rape saves your morning mood?\nI like to jerk off in coffee when nobody watching. Like it?";
+            // var dialog = new DialogComponent();
+            // dialog.Name = "Karen";
+            // dialog.Text = "Hello, Sunshine. Maybe some violent rape saves your morning mood?\nI like to jerk off in coffee when nobody watching. Like it?";
+
+            var listChoices = new List<Choice>();
+            listChoices.Add(new Choice("satans_call", "Heil Satan!"));
+            listChoices.Add(new Choice("masterbate", "<Starting wildly masturbate>"));
+            listChoices.Add(new Choice("coffee", "Hey... eehhh... Coffee??"));
+            listChoices.Add(new Choice("suck", "You suck fuck you fucking fuck ////"));
+            var choices = new ChoiceComponent(listChoices);
             gameState.Attach(bg);
-            gameState.Attach(dialog);
+            // gameState.Attach(dialog);
+            gameState.Attach(choices);
         }
 
         protected override void Update(GameTime gameTime)
