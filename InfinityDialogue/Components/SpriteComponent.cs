@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -15,6 +16,21 @@ namespace InfinityDialogue.Components
         public SpriteComponent(Texture2D texture)
         {
             Texture = texture;
+        }
+    }
+
+    public class SpriteFontComponent
+    {
+        public SpriteFont SpriteFont { get; set; }
+        public StringBuilder Text { get; set; }
+        public Color Color { get; set; } = Color.Black;
+        public Vector2 Position { get; set; }
+        public bool IsVisible { get; set; } = true;
+        public bool IsAnimated { get; set; }
+
+        public SpriteFontComponent(SpriteFont spriteFont)
+        {
+            SpriteFont = spriteFont;
         }
     }
 }

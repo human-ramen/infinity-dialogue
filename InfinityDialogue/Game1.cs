@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Text;
 using HumanRamen;
 using InfinityDialogue.Components;
 using InfinityDialogue.Systems;
@@ -16,12 +16,15 @@ namespace InfinityDialogue
         private SpriteBatch _spriteBatch;
         private World _world;
         private GameContent _content;
+        private LuaAdapter _luaAdapter;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             _commander = new Commander();
             _commander.RegisterHandler("Control", this);
+
+            _luaAdapter = new LuaAdapter();
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -39,7 +42,7 @@ namespace InfinityDialogue
 
 
             _world = new WorldBuilder()
-                .AddSystem(new ControlSystem(_commander))
+                .AddSystem(new ControlSystem(_luaAdapter, _commander))
                 .AddSystem(new RenderSystem(_spriteBatch, _content))
                 // .AddSystem(new DialogueSystem(_spriteBatch, _content.BrandFont))
                 .AddSystem(new DebugSystem(_content, _commander))
@@ -48,7 +51,11 @@ namespace InfinityDialogue
             var env = _world.CreateEntity();
             var bg = new SpriteComponent(_content.BGKitchen);
             bg.IsBackground = true;
+            var title = new SpriteFontComponent(_content.BrandFont);
+            title.Text = new StringBuilder("Hey it's titile");
+            title.Position = new Vector2(100, 100);
             env.Attach(bg);
+            env.Attach(title);
         }
 
         protected override void Update(GameTime gameTime)
@@ -65,7 +72,6 @@ namespace InfinityDialogue
 
         public void HandleCommand(string topic, string command)
         {
-            Console.WriteLine(command);
             if (topic == "Control" && command == "Fullscreen")
             {
                 _graphics.ToggleFullScreen();

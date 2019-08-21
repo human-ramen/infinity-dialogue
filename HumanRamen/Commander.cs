@@ -36,26 +36,6 @@ namespace HumanRamen
         }
     }
 
-    public class CommanderLogger
-    {
-        private readonly Logger _l = new Logger("Commander");
-        private readonly Commander _c = new Commander();
-
-        public void RegisterHandler(string topic, ICommandHandler handler)
-        {
-            _c.RegisterHandler(topic, handler);
-
-            _l.Debug(String.Format("Registered {0} with topic {1}", handler.GetType(), topic));
-        }
-
-        public void Command(string topic, string command)
-        {
-            _c.Command(topic, command);
-
-            _l.Debug(String.Format("Topic: {0}, Command {1}", topic, command));
-        }
-    }
-
     public class ExceptionNoSuchTopic : Exception
     {
         public ExceptionNoSuchTopic(string topic) : base(String.Format("No such topic {0}", topic))

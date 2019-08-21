@@ -13,17 +13,21 @@ namespace InfinityDialogue.Systems
         private readonly string _topic = "Control";
 
         private Commander _commander;
-        private Dictionary<Keys, string> _kbdmap = new Dictionary<Keys, string>();
+        private LuaAdapter _luaAdapter;
+        private Dictionary<Keys, string> _kbdmap;
 
-        public ControlSystem(Commander commander)
+        public ControlSystem(LuaAdapter luaAdapter, Commander commander)
         {
+            _luaAdapter = luaAdapter;
             _commander = commander;
 
+            _kbdmap = _luaAdapter.GetControlScheme();
+
             // TODO parse lua config
-            _kbdmap.Add(Keys.Q, "Exit");
-            _kbdmap.Add(Keys.Space, "Continue");
-            _kbdmap.Add(Keys.F, "Fullscreen");
-            _kbdmap.Add(Keys.D, "ToggleDebugConsole");
+            // _kbdmap.Add(Keys.Q, "Exit");
+            // _kbdmap.Add(Keys.Space, "Continue");
+            // _kbdmap.Add(Keys.F, "Fullscreen");
+            // _kbdmap.Add(Keys.D, "ToggleDebugConsole");
         }
 
         public override void Update(GameTime gameTime)
