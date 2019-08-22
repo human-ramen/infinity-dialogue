@@ -1,0 +1,22 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:bin/$(Platform)
+/intermediateDir:obj/$(Platform)
+/platform:DesktopGL
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+/reference:../../../client/Pipeline Extension/MonoGameUniversalEffects.Pipeline.dll
+
+#---------------------------------- Content ---------------------------------#
+
+#begin Effects/crt-lottes-mg.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/crt-lottes-mg.fx
+

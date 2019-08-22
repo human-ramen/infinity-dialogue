@@ -5,6 +5,8 @@ namespace InfinityDialogue
 {
     public class GameContent
     {
+        public Effect FxBlank { get; set; }
+
         public SpriteFont BrandFont { get; set; }
 
         public Texture2D BgKitchen { get; set; }
@@ -13,6 +15,8 @@ namespace InfinityDialogue
 
         public GameContent(ContentManager Content)
         {
+            FxBlank = Content.Load<Effect>("Effects/Blank");
+
             BrandFont = Content.Load<SpriteFont>("LeagueGothic16");
 
             BgKitchen = Content.Load<Texture2D>("BgKitchen");

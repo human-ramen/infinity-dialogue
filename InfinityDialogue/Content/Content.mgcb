@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:../../../client/Pipeline Extension/MonoGameUniversalEffects.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -36,6 +37,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ChrKaren.png
+
+#begin Effects/Blank.fx
+/importer:EffectImporter
+/processor:RemoteEffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/Blank.fx
 
 #begin LeagueGothic16.spritefont
 /importer:FontDescriptionImporter
