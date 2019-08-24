@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using InfinityDialogue.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -11,7 +12,7 @@ namespace InfinityDialogue.Components
         void CalculatePosition(int width, int height);
     }
 
-    public class SpriteComponent
+    public class SpriteComponent : IVisible
     {
         public Texture2D Texture { get; set; }
         public Rectangle Position { get; set; }
@@ -40,7 +41,7 @@ namespace InfinityDialogue.Components
         }
     }
 
-    public class SpriteFontComponent
+    public class SpriteFontComponent : IVisible
     {
         public SpriteFont SpriteFont { get; set; }
         public StringBuilder Text { get; set; } = new StringBuilder();
@@ -81,7 +82,7 @@ namespace InfinityDialogue.Components
         }
     }
 
-    public class TextMenuItemComponent : SpriteFontComponent, ICalculatePosition
+    public class TextMenuItemComponent : SpriteFontComponent, ICalculatePosition, IVisible
     {
         public int Order { get; set; }
 
@@ -119,9 +120,11 @@ namespace InfinityDialogue.Components
         }
     }
 
-    public class TextMenuComponent
+    public class TextMenuComponent : IVisible
     {
         public List<TextMenuItemComponent> Items;
+
+        public bool IsVisible { get; set; } = true;
 
         public TextMenuComponent(List<TextMenuItemComponent> items)
         {

@@ -8,11 +8,10 @@ using MonoGame.Extended.Entities.Systems;
 
 namespace InfinityDialogue.Systems
 {
-    public class ChoiceSystem : EntityProcessingSystem, ICommandHandler
+    public class ChoiceSystem : EntityProcessingSystem
     {
         private readonly GraphicsDevice _graphic;
         private readonly GameContent _content;
-        private readonly Commander _commander;
 
         private ComponentMapper<ChoiceComponent> _choiceMapper;
 
@@ -21,21 +20,17 @@ namespace InfinityDialogue.Systems
         private Entity _currentEntity;
         private ChoiceComponent _currentChoiceComponent;
         private TextMenuComponent _currentTextMenuComponent;
-        private bool _isControlled = true;
-        private int _currentChoiceNum;
+
+        private int _currentSelected;
 
         public ChoiceSystem(GraphicsDevice graphic,
-                            GameContent content,
-                            Commander commander) :
+                            GameContent content) :
             base(Aspect.All(typeof(ChoiceComponent)))
         {
             _graphic = graphic;
             _content = content;
-            _commander = commander;
 
             _uiDialogComponent = new UIDialogComponent(new ColoredTexture(_graphic, Color.Black));
-
-            _commander.RegisterHandler("Control", this);
         }
 
         public override void Initialize(IComponentMapperService mapperService)
@@ -46,63 +41,48 @@ namespace InfinityDialogue.Systems
 
         public override void Process(GameTime gameTime, int entityId)
         {
-            if (_currentTextMenuComponent == null)
+            if (_currentChoiceComponent == null || _currentChoiceComponent.IsConstructed == false)
             {
                 _currentChoiceComponent = _choiceMapper.Get(entityId);
 
                 var menu = new List<TextMenuItemComponent>();
 
-                var order = 0;
+                var count = 0;
                 foreach (var choice in _currentChoiceComponent.Choices)
                 {
-                    var item = new TextMenuItemComponent(_content.BrandFont, order, choice.Text);
+                    var item = new TextMenuItemComponent(_content.BrandFont, count, choice.Text);
 
-                    if (item.Order == _currentChoiceNum)
+                    if (item.Order == _currentChoiceComponent.Selected)
                     {
                         item.Color = Color.Yellow;
+                        _currentSelected = count;
                     }
 
                     menu.Add(item);
-                    order++;
+                    count++;
                 }
 
                 _currentTextMenuComponent = new TextMenuComponent(menu);
 
                 _currentEntity.Attach(_uiDialogComponent);
                 _currentEntity.Attach(_currentTextMenuComponent);
+
+                _currentChoiceComponent.IsConstructed = true;
             }
 
-        }
-
-        public void HandleCommand(string topic, string command)
-        {
-            if (!_isControlled) return;
-
-            if (command == "Up")
+            if (_currentSelected != _currentChoiceComponent.Selected)
             {
-                if (_currentChoiceNum == 0) return;
-                chooseIndex(--_currentChoiceNum);
-            }
-            else if (command == "Down")
-            {
-                if (_currentChoiceNum == 3) return;
-                chooseIndex(++_currentChoiceNum);
-            }
-            else if (command == "Enter")
-            {
-                _isControlled = false;
-                _commander.Command("Choice", _currentChoiceComponent.Choices[_currentChoiceNum].Id);
-            }
-        }
+                _currentSelected = _currentChoiceComponent.Selected;
 
-        private void chooseIndex(int index)
-        {
-            foreach (var item in _currentTextMenuComponent.Items)
-            {
-                item.Color = Color.White;
+                foreach (var item in _currentTextMenuComponent.Items)
+                {
+                    item.Color = Color.White;
+                }
+
+                _currentTextMenuComponent.Items[_currentSelected].Color = Color.Yellow;
             }
 
-            _currentTextMenuComponent.Items[index].Color = Color.Yellow;
+            _currentTextMenuComponent.IsVisible = _currentChoiceComponent.IsVisible;
         }
     }
 }

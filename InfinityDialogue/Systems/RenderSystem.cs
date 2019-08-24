@@ -6,6 +6,11 @@ using MonoGame.Extended.Entities.Systems;
 
 namespace InfinityDialogue.Systems
 {
+    public interface IVisible
+    {
+        bool IsVisible { get; set; }
+    }
+
     public class RenderSystem : EntityDrawSystem
     {
         private SpriteBatch _spriteBatch;
@@ -58,7 +63,7 @@ namespace InfinityDialogue.Systems
                 // Consider switching to F#;
 
                 var textMenu = _textMenuMapper.Get(entity);
-                if (textMenu != null)
+                if (textMenu != null && textMenu.IsVisible)
                 {
                     // TODO: Things getting absolute crazy
                     foreach (var item in textMenu.Items)

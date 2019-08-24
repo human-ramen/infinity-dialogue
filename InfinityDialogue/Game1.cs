@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using HumanRamen;
-using InfinityDialogue.Components;
+﻿using HumanRamen;
 using InfinityDialogue.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,15 +14,12 @@ namespace InfinityDialogue
         private SpriteBatch _spriteBatch;
         private World _world;
         private GameContent _content;
-        private LuaAdapter _luaAdapter;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             _commander = new Commander();
             _commander.RegisterHandler("Control", this);
-
-            _luaAdapter = new LuaAdapter();
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -42,36 +37,13 @@ namespace InfinityDialogue
 
 
             _world = new WorldBuilder()
-                .AddSystem(new ControlSystem(_luaAdapter, _commander))
+                .AddSystem(new ScenarioSystem(_content, _commander))
+                .AddSystem(new ControlSystem(_commander))
                 .AddSystem(new RenderSystem(_spriteBatch, _content))
-                .AddSystem(new DialogSystem(_graphics.GraphicsDevice, _content, _commander))
-                .AddSystem(new ChoiceSystem(_graphics.GraphicsDevice, _content, _commander))
+                .AddSystem(new DialogSystem(_graphics.GraphicsDevice, _content))
+                .AddSystem(new ChoiceSystem(_graphics.GraphicsDevice, _content))
                 .AddSystem(new DebugSystem(_content, _commander))
                 .Build();
-
-            var karen = _world.CreateEntity();
-            var sprite = new SpriteComponent(_content.ChrKaren);
-            sprite.Depth = 0.4f;
-            sprite.Position = new Rectangle(150, 30, _content.ChrKaren.Width / 2, _content.ChrKaren.Height / 2);
-            karen.Attach(sprite);
-
-            var gameState = _world.CreateEntity();
-            // TODO: Render layers
-            var bg = new SpriteComponent(_content.BgKitchen);
-            bg.IsBackground = true;
-            // var dialog = new DialogComponent();
-            // dialog.Name = "Karen";
-            // dialog.Text = "Hello, Sunshine. Maybe some violent rape saves your morning mood?\nI like to jerk off in coffee when nobody watching. Like it?";
-
-            var listChoices = new List<Choice>();
-            listChoices.Add(new Choice("satans_call", "Heil Satan!"));
-            listChoices.Add(new Choice("masterbate", "<Starting wildly masturbate>"));
-            listChoices.Add(new Choice("coffee", "Hey... eehhh... Coffee??"));
-            listChoices.Add(new Choice("suck", "You suck fuck you fucking fuck ////"));
-            var choices = new ChoiceComponent(listChoices);
-            gameState.Attach(bg);
-            // gameState.Attach(dialog);
-            gameState.Attach(choices);
         }
 
         protected override void Update(GameTime gameTime)

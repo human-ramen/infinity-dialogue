@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HumanRamen;
@@ -5,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Entities.Systems;
 using MonoGame.Extended.Input;
+using NLua;
 
 namespace InfinityDialogue.Systems
 {
@@ -13,15 +15,27 @@ namespace InfinityDialogue.Systems
         private readonly string _topic = "Control";
 
         private Commander _commander;
-        private LuaAdapter _luaAdapter;
         private Dictionary<Keys, string> _kbdmap;
 
-        public ControlSystem(LuaAdapter luaAdapter, Commander commander)
+        public ControlSystem(Commander commander)
         {
-            _luaAdapter = luaAdapter;
             _commander = commander;
 
-            _kbdmap = _luaAdapter.GetControlScheme();
+
+            var lua = new Lua();
+
+            lua.NewTable("kbd");
+            lua.DoFile("./Lua/controls.lua");
+
+            var raw = lua.GetTableDict(lua.GetTable("kbd")) as Dictionary<object, object>;
+
+            _kbdmap = new Dictionary<Keys, string>();
+            foreach (var row in raw)
+            {
+                _kbdmap.Add(Enum.Parse<Keys>(row.Key.ToString()), row.Value.ToString());
+            }
+
+            lua.Dispose();
 
             // _kbdmap.Add(Keys.Q, "Exit");
             // _kbdmap.Add(Keys.Space, "Continue");

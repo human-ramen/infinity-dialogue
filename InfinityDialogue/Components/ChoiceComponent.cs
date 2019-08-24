@@ -4,12 +4,12 @@ namespace InfinityDialogue.Components
 {
     public class Choice
     {
-        public string Id { get; set; }
+        public string Key { get; set; }
         public string Text { get; set; }
 
-        public Choice(string id, string text)
+        public Choice(string key, string text)
         {
-            Id = id;
+            Key = key;
             Text = text;
         }
 
@@ -19,6 +19,10 @@ namespace InfinityDialogue.Components
     public class ChoiceComponent
     {
         public List<Choice> Choices { get; set; }
+        public int Selected { get; set; }
+
+        public bool IsVisible { get; set; } = true;
+        public bool IsConstructed { get; set; }
 
         public ChoiceComponent(List<Choice> choices)
         {
