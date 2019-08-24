@@ -21,17 +21,10 @@ namespace InfinityDialogue.Systems
 
         private ComponentMapper<SpriteComponent> _spriteMapper;
         private ComponentMapper<SpriteFontComponent> _spriteFontMapper;
-        private ComponentMapper<TextNameComponent> _textNameMapper;
-        private ComponentMapper<TextDialogComponent> _textDialogMapper;
-        private ComponentMapper<TextMenuComponent> _textMenuMapper;
-        private ComponentMapper<UIDialogComponent> _uiDialogMapper;
 
         // TODO: Maybe refactor all this mess?
         public RenderSystem(SpriteBatch spriteBatch, GameContent content) :
-            base(Aspect.One(typeof(SpriteComponent), typeof(SpriteFontComponent),
-                            typeof(TextNameComponent), typeof(TextDialogComponent),
-                            typeof(TextMenuComponent),
-                            typeof(UIDialogComponent)))
+            base(Aspect.One(typeof(SpriteComponent), typeof(SpriteFontComponent)))
         {
             _spriteBatch = spriteBatch;
             _content = content;
@@ -41,10 +34,6 @@ namespace InfinityDialogue.Systems
         {
             _spriteMapper = mapperService.GetMapper<SpriteComponent>();
             _spriteFontMapper = mapperService.GetMapper<SpriteFontComponent>();
-            _textNameMapper = mapperService.GetMapper<TextNameComponent>();
-            _textDialogMapper = mapperService.GetMapper<TextDialogComponent>();
-            _textMenuMapper = mapperService.GetMapper<TextMenuComponent>();
-            _uiDialogMapper = mapperService.GetMapper<UIDialogComponent>();
         }
 
         public override void Draw(GameTime gameTime)
@@ -52,45 +41,13 @@ namespace InfinityDialogue.Systems
             _w = _spriteBatch.GraphicsDevice.Viewport.Width;
             _h = _spriteBatch.GraphicsDevice.Viewport.Height;
 
-            _spriteBatch.GraphicsDevice.Clear(Color.White);
-
-            _spriteBatch.Begin(sortMode: SpriteSortMode.FrontToBack,
-                               blendState: BlendState.AlphaBlend);
-
             foreach (var entity in ActiveEntities)
             {
-                // TODO: I will hate myself when see this code after a while, but woah! This is beautiful.
-                // Consider switching to F#;
-
-                var textMenu = _textMenuMapper.Get(entity);
-                if (textMenu != null && textMenu.IsVisible)
-                {
-                    // TODO: Things getting absolute crazy
-                    foreach (var item in textMenu.Items)
-                    {
-                        drawSpriteFont(calculatePosition<TextMenuItemComponent>(item));
-                    }
-                }
 
                 drawSprite(_spriteMapper.Get(entity));
-                drawSprite(calculatePosition<UIDialogComponent>(_uiDialogMapper.Get(entity)));
 
                 drawSpriteFont(_spriteFontMapper.Get(entity));
-                drawSpriteFont(calculatePosition<TextNameComponent>(_textNameMapper.Get(entity)));
-                drawSpriteFont(calculatePosition<TextDialogComponent>(_textDialogMapper.Get(entity)));
             }
-
-            _spriteBatch.End();
-        }
-
-        private T calculatePosition<T>(ICalculatePosition sprite)
-        {
-            if (sprite != null)
-            {
-                sprite.CalculatePosition(_w, _h);
-            }
-
-            return (T)sprite;
         }
 
         private void drawSprite(SpriteComponent sprite)

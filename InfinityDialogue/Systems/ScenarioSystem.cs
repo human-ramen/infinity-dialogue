@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using HumanRamen;
 using InfinityDialogue.Components;
@@ -9,7 +8,7 @@ using NLua;
 
 namespace InfinityDialogue.Systems
 {
-    public class ScenarioSystem : UpdateSystem, ICommandHandler
+    public class ScenarioSystem : UpdateSystem
     {
         public enum State
         {
@@ -40,7 +39,7 @@ namespace InfinityDialogue.Systems
             _content = content;
             _commander = commander;
 
-            _commander.RegisterHandler("Control", this);
+            // _commander.RegisterHandler("Control", this);
         }
 
         public override void Initialize(World world)
@@ -133,58 +132,58 @@ namespace InfinityDialogue.Systems
             }
         }
 
-        public void HandleCommand(string topic, string command)
-        {
-            if (!_currentNodeInited) return;
+        // public void HandleCommand(string topic, string command)
+        // {
+        //     if (!_currentNodeInited) return;
 
-            if (topic == "Control" && command == "Continue" && _state == State.Dialog)
-            {
-                _state = State.Choice;
-                _currentNodeInited = false;
-            }
+        //     if (topic == "Control" && command == "Continue" && _state == State.Dialog)
+        //     {
+        //         _state = State.Choice;
+        //         _currentNodeInited = false;
+        //     }
 
-            if (topic == "Control" && command == "Enter" && _state == State.Choice)
-            {
-                var id = _currentChoiceComponent.Choices[_currentChoiceComponent.Selected].Key;
-                if (_currentNode.Responses[id] == null)
-                {
-                    _l.Debug(id);
-                    foreach (var resp in _currentNode.Responses)
-                    {
-                        _l.Debug(resp.ToString());
-                    }
-                    throw new Exception("Node is null");
-                }
-                _currentNode = _currentNode.Responses[id];
+        //     if (topic == "Control" && command == "Enter" && _state == State.Choice)
+        //     {
+        //         var id = _currentChoiceComponent.Choices[_currentChoiceComponent.Selected].Key;
+        //         if (_currentNode.Responses[id] == null)
+        //         {
+        //             _l.Debug(id);
+        //             foreach (var resp in _currentNode.Responses)
+        //             {
+        //                 _l.Debug(resp.ToString());
+        //             }
+        //             throw new Exception("Node is null");
+        //         }
+        //         _currentNode = _currentNode.Responses[id];
 
-                _state = State.Dialog;
-                _currentNodeInited = false;
-            }
+        //         _state = State.Dialog;
+        //         _currentNodeInited = false;
+        //     }
 
-            if (topic == "Control" && command == "Down" && _state == State.Choice)
-            {
-                if (_currentChoiceComponent.Selected != _currentChoiceComponent.Choices.Count - 1)
-                {
-                    _currentChoiceComponent.Selected++;
-                }
-                else
-                {
-                    _currentChoiceComponent.Selected = 0;
-                }
-            }
+        //     if (topic == "Control" && command == "Down" && _state == State.Choice)
+        //     {
+        //         if (_currentChoiceComponent.Selected != _currentChoiceComponent.Choices.Count - 1)
+        //         {
+        //             _currentChoiceComponent.Selected++;
+        //         }
+        //         else
+        //         {
+        //             _currentChoiceComponent.Selected = 0;
+        //         }
+        //     }
 
-            if (topic == "Control" && command == "Up" && _state == State.Choice)
-            {
-                if (_currentChoiceComponent.Selected != 0)
-                {
-                    _currentChoiceComponent.Selected--;
-                }
-                else
-                {
-                    _currentChoiceComponent.Selected = _currentChoiceComponent.Choices.Count - 1;
-                }
-            }
-        }
+        //     if (topic == "Control" && command == "Up" && _state == State.Choice)
+        //     {
+        //         if (_currentChoiceComponent.Selected != 0)
+        //         {
+        //             _currentChoiceComponent.Selected--;
+        //         }
+        //         else
+        //         {
+        //             _currentChoiceComponent.Selected = _currentChoiceComponent.Choices.Count - 1;
+        //         }
+        //     }
+        // }
 
         public override void Dispose()
         {

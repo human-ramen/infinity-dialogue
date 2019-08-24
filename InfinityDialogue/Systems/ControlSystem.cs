@@ -21,7 +21,6 @@ namespace InfinityDialogue.Systems
         {
             _commander = commander;
 
-
             var lua = new Lua();
 
             lua.NewTable("kbd");
