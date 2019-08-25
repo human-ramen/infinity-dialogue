@@ -1,3 +1,7 @@
+Characters:Add("Karen", "ChrKaren")
+
+Background = "BgKitchen"
+
 startNode = Scenario:CreateNode("Karen", "Hello, Human")
 
 okNode = Scenario:CreateNode("Karen", "That's OK. Whanna kick me?")

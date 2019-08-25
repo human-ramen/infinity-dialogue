@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using HumanRamen;
+using InfinityDialogue.Components;
 using InfinityDialogue.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using NLua;
@@ -35,6 +37,12 @@ namespace InfinityDialogue.Systems
         private Scenario.Node _currentNode;
         private bool _currentNodeInited;
 
+        private SpriteComponent _backgroundSprite;
+
+        private Characters _characters;
+        private Dictionary<string, Entity> _characterEntities = new Dictionary<string, Entity>();
+        private Dictionary<string, SpriteComponent> _characterSprites = new Dictionary<string, SpriteComponent>();
+
         public ScenarioSystem(GameContent content, UISystem ui, Commander commander)
         {
             _content = content;
@@ -49,39 +57,46 @@ namespace InfinityDialogue.Systems
             _scenarioEntity = world.CreateEntity();
 
             _lua.LoadCLRPackage();
+
+            var characters = new Characters();
+            _lua["Characters"] = characters;
+
             var scenario = new Scenario();
             _lua["Scenario"] = scenario;
 
             _lua.DoFile(_startScript);
 
+            if (_lua.GetString("Background") != "")
+            {
+                _backgroundSprite = new SpriteComponent(_content.GetType().GetProperty(_lua.GetString("Background")).GetValue(_content) as Texture2D);
+                _backgroundSprite.IsBackground = true;
+                _scenarioEntity.Attach(_backgroundSprite);
+            }
+
+            // Create character's entity
+
+            foreach (var chr in characters.Pool)
+            {
+                var name = chr.Value.Name;
+                var spritePath = chr.Value.SpritePath;
+
+                _l.Debug(String.Format("Add chr: name {0}, sprite {1}", name, spritePath));
+
+                _characterEntities[name] = world.CreateEntity();
+
+                var spriteComponent = new SpriteComponent(_content.GetType().GetProperty(spritePath).GetValue(_content) as Texture2D);
+                // TODO: calculate position according to attributes
+                spriteComponent.Position = new Rectangle(150, 30, _content.ChrKaren.Width / 2, _content.ChrKaren.Height / 2);
+                spriteComponent.Depth = 0.0f;
+
+                _characterSprites.Add(name, spriteComponent);
+                _characterEntities[name].Attach(spriteComponent);
+            }
+
             _currentNode = scenario.Start;
             // TODO: check node type
             _state = State.Dialog;
             _ui.IsDialogBackgroundVisible = true;
-
-            // var karen = _world.CreateEntity();
-            // var sprite = new SpriteComponent(_content.ChrKaren);
-            // sprite.Depth = 0.4f;
-            // sprite.Position = new Rectangle(150, 30, _content.ChrKaren.Width / 2, _content.ChrKaren.Height / 2);
-            // karen.Attach(sprite);
-
-            // var gameState = _world.CreateEntity();
-            // // TODO: Render layers
-            // var bg = new SpriteComponent(_content.BgKitchen);
-            // bg.IsBackground = true;
-            // // var dialog = new DialogComponent();
-            // // dialog.Name = "Karen";
-            // // dialog.Text = "Hello, Sunshine. Maybe some violent rape saves your morning mood?\nI like to jerk off in coffee when nobody watching. Like it?";
-
-            // var listChoices = new List<Choice>();
-            // listChoices.Add(new Choice("satans_call", "Heil Satan!"));
-            // listChoices.Add(new Choice("masterbate", "<Starting wildly masturbate>"));
-            // listChoices.Add(new Choice("coffee", "Hey... eehhh... Coffee??"));
-            // listChoices.Add(new Choice("suck", "You suck fuck you fucking fuck ////"));
-            // var choices = new ChoiceComponent(listChoices);
-            // gameState.Attach(bg);
-            // // gameState.Attach(dialog);
-            // gameState.Attach(choices);
         }
 
 
