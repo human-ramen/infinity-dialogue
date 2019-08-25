@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using HumanRamen;
+﻿using HumanRamen;
 using InfinityDialogue.Systems;
 using InfinityDialogue.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Entities;
-using static InfinityDialogue.UI.Choices;
 
 namespace InfinityDialogue
 {
@@ -42,21 +40,11 @@ namespace InfinityDialogue
             _ui = new UISystem(_spriteBatch, _content, _commander);
 
             _world = new WorldBuilder()
-                .AddSystem(new ScenarioSystem(_content, _commander))
+                .AddSystem(new ScenarioSystem(_content, _ui, _commander))
                 .AddSystem(new ControlSystem(_commander))
                 .AddSystem(new RenderSystem(_spriteBatch, _content))
-                // .AddSystem(new DialogSystem(_graphics.GraphicsDevice, _content))
-                // .AddSystem(new ChoiceSystem(_graphics.GraphicsDevice, _content))
                 .AddSystem(new DebugSystem(_content, _commander))
                 .Build();
-
-            _ui.IsDialogBackgroundVisible = true;
-            // _ui.UpdateDialog(new Dialog("Karen", "Hello yyyyy uuuuu WOOOORLD long text hey\nhey hey hey hey"));
-            var choicesList = new List<Choice>();
-            choicesList.Add(new Choice("keyone", "heyhoa"));
-            choicesList.Add(new Choice("keytwo", "heyhoaaa"));
-            choicesList.Add(new Choice("keythree", "wow"));
-            _ui.UpdateChoices(new Choices(choicesList));
         }
 
         protected override void Update(GameTime gameTime)

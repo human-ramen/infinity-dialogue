@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using HumanRamen;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,10 +36,6 @@ namespace InfinityDialogue.UI
         private List<Choice> _currentChoices;
         private int _currentSelected;
 
-        private StringBuilder _dialogBuff = new StringBuilder();
-        private int _dialogTimeout;
-
-
         public UISystem(SpriteBatch spriteBatch, GameContent content, Commander commander)
         {
             _palette = new Palette(spriteBatch.GraphicsDevice);
@@ -63,24 +58,23 @@ namespace InfinityDialogue.UI
 
         public void HandleCommand(string topic, string command)
         {
-            if (_state == state.Dialog && _dialogBuff.Length < _currentDialogText.Length
-                && topic == "Control" && command == "Enter")
-            {
-                _isDialogAnimationDone = true;
-                _dialogBuff.Clear();
-                _dialogBuff.Append(_currentDialogText);
-            }
-
             if (_state == state.Dialog && _isDialogAnimationDone
                 && topic == "Control" && command == "Enter")
             {
                 _l.Debug("EVENT: Next dialog");
+                _commander.Command("UI", "Continue");
+                _currentSelected = 0;
+                return;
             }
 
             if (_state == state.Choice
                 && topic == "Control" && command == "Enter")
             {
-                _l.Debug(String.Format("EVENT: Selected ID: {0}", _currentChoices[_currentSelected].Key));
+                var key = _currentChoices[_currentSelected].Key;
+
+                _l.Debug(String.Format("EVENT: Selected ID: {0}", key));
+                _commander.Command("UI", key);
+                return;
             }
 
             if (_state == state.Choice
@@ -94,6 +88,7 @@ namespace InfinityDialogue.UI
                 {
                     _currentSelected = 0;
                 }
+                return;
             }
 
             if (_state == state.Choice
@@ -107,6 +102,7 @@ namespace InfinityDialogue.UI
                 {
                     _currentSelected = _currentChoices.Count - 1;
                 }
+                return;
             }
         }
 
@@ -133,25 +129,9 @@ namespace InfinityDialogue.UI
 
         public void drawDialog()
         {
-            if (_dialogBuff.Length < _currentDialogText.Length && _dialogTimeout == 3)
-            {
-                _isDialogAnimationDone = false;
+            // TODO: text animation
 
-                _dialogBuff.Append(_currentDialogText[_dialogBuff.Length]);
-                // _commander.Command("Sound", "HighPitchVoice");
-
-                _dialogTimeout = 0;
-            }
-
-            if (_isDialogAnimationDone == false)
-            {
-                _dialogTimeout++;
-            }
-
-            if (_dialogBuff.Length == _currentDialogText.Length)
-            {
-                _isDialogAnimationDone = true;
-            }
+            _isDialogAnimationDone = true;
 
             if (_currentDialogName != "")
             {
@@ -161,7 +141,7 @@ namespace InfinityDialogue.UI
 
             if (_currentDialogText != "")
             {
-                _spriteBatch.DrawString(_fonts.Brand, _dialogBuff.ToString(), new Vector2(_w / 50 + 15, _h - _h / 4 + 35),
+                _spriteBatch.DrawString(_fonts.Brand, _currentDialogText, new Vector2(_w / 50 + 15, _h - _h / 4 + 35),
                                       Color.White, 0.0f, Vector2.Zero, 1f, SpriteEffects.None, 1);
             }
         }

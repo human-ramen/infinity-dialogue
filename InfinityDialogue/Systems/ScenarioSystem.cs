@@ -1,14 +1,16 @@
+using System;
 using System.Collections.Generic;
 using HumanRamen;
-using InfinityDialogue.Components;
+using InfinityDialogue.UI;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Entities;
 using MonoGame.Extended.Entities.Systems;
 using NLua;
+using static InfinityDialogue.UI.Choices;
 
 namespace InfinityDialogue.Systems
 {
-    public class ScenarioSystem : UpdateSystem
+    public class ScenarioSystem : UpdateSystem, ICommandHandler
     {
         public enum State
         {
@@ -22,6 +24,7 @@ namespace InfinityDialogue.Systems
         private readonly Lua _lua = new Lua();
 
         private readonly GameContent _content;
+        private readonly UISystem _ui;
         private readonly Commander _commander;
 
         private readonly string _startScript = "Lua/test_scenario.lua";
@@ -31,15 +34,14 @@ namespace InfinityDialogue.Systems
 
         private Scenario.Node _currentNode;
         private bool _currentNodeInited;
-        private DialogComponent _currentDialogComponent;
-        private ChoiceComponent _currentChoiceComponent;
 
-        public ScenarioSystem(GameContent content, Commander commander)
+        public ScenarioSystem(GameContent content, UISystem ui, Commander commander)
         {
             _content = content;
+            _ui = ui;
             _commander = commander;
 
-            // _commander.RegisterHandler("Control", this);
+            _commander.RegisterHandler("UI", this);
         }
 
         public override void Initialize(World world)
@@ -53,7 +55,9 @@ namespace InfinityDialogue.Systems
             _lua.DoFile(_startScript);
 
             _currentNode = scenario.Start;
+            // TODO: check node type
             _state = State.Dialog;
+            _ui.IsDialogBackgroundVisible = true;
 
             // var karen = _world.CreateEntity();
             // var sprite = new SpriteComponent(_content.ChrKaren);
@@ -85,110 +89,62 @@ namespace InfinityDialogue.Systems
         {
             if (!_currentNodeInited && _state == State.Dialog)
             {
-                if (_currentDialogComponent == null)
-                {
-                    _currentDialogComponent = new DialogComponent();
-                }
-                else
-                {
-                    _currentDialogComponent.IsVisible = true;
-                    _currentDialogComponent.IsConstructed = false;
-                }
-                _currentDialogComponent.Name = _currentNode.DialogueName;
-                _currentDialogComponent.Text = _currentNode.DialogueText;
-
-                if (_currentChoiceComponent != null) _currentChoiceComponent.IsVisible = false;
-
-                _scenarioEntity.Attach(_currentDialogComponent);
+                _ui.UpdateDialog(new Dialog(_currentNode.DialogueName, _currentNode.DialogueText));
 
                 _currentNodeInited = true;
             }
 
             if (!_currentNodeInited && _state == State.Choice)
             {
-                var choices = new List<Choice>();
+                var choicesList = new List<Choice>();
 
-                foreach (var c in _currentNode.Responses)
+                foreach (var choice in _currentNode.Responses)
                 {
-                    choices.Add(new Choice(c.Key, c.Key));
+                    choicesList.Add(new Choice(choice.Key, choice.Key));
                 }
 
-                if (_currentChoiceComponent == null)
-                {
-
-                    _currentChoiceComponent = new ChoiceComponent(choices);
-                }
-                else
-                {
-                    _currentChoiceComponent.IsVisible = true;
-                    _currentChoiceComponent.IsConstructed = true;
-                }
-
-                if (_currentDialogComponent != null) _currentDialogComponent.IsVisible = false;
-
-                _scenarioEntity.Attach(_currentChoiceComponent);
+                var choices = new Choices(choicesList);
+                _ui.UpdateChoices(choices);
 
                 _currentNodeInited = true;
             }
         }
 
-        // public void HandleCommand(string topic, string command)
-        // {
-        //     if (!_currentNodeInited) return;
-
-        //     if (topic == "Control" && command == "Continue" && _state == State.Dialog)
-        //     {
-        //         _state = State.Choice;
-        //         _currentNodeInited = false;
-        //     }
-
-        //     if (topic == "Control" && command == "Enter" && _state == State.Choice)
-        //     {
-        //         var id = _currentChoiceComponent.Choices[_currentChoiceComponent.Selected].Key;
-        //         if (_currentNode.Responses[id] == null)
-        //         {
-        //             _l.Debug(id);
-        //             foreach (var resp in _currentNode.Responses)
-        //             {
-        //                 _l.Debug(resp.ToString());
-        //             }
-        //             throw new Exception("Node is null");
-        //         }
-        //         _currentNode = _currentNode.Responses[id];
-
-        //         _state = State.Dialog;
-        //         _currentNodeInited = false;
-        //     }
-
-        //     if (topic == "Control" && command == "Down" && _state == State.Choice)
-        //     {
-        //         if (_currentChoiceComponent.Selected != _currentChoiceComponent.Choices.Count - 1)
-        //         {
-        //             _currentChoiceComponent.Selected++;
-        //         }
-        //         else
-        //         {
-        //             _currentChoiceComponent.Selected = 0;
-        //         }
-        //     }
-
-        //     if (topic == "Control" && command == "Up" && _state == State.Choice)
-        //     {
-        //         if (_currentChoiceComponent.Selected != 0)
-        //         {
-        //             _currentChoiceComponent.Selected--;
-        //         }
-        //         else
-        //         {
-        //             _currentChoiceComponent.Selected = _currentChoiceComponent.Choices.Count - 1;
-        //         }
-        //     }
-        // }
-
         public override void Dispose()
         {
             _lua.Dispose();
             base.Dispose();
+        }
+
+        public void HandleCommand(string topic, string command)
+        {
+            if (_state == State.Dialog && topic == "UI" && command == "Continue")
+            {
+                _state = State.Choice;
+                _currentNodeInited = false;
+                return;
+            }
+
+            if (_state == State.Choice && topic == "UI")
+            {
+                if (!_currentNode.Responses.ContainsKey(command))
+                {
+                    throw new ExceptionNullNode(command);
+                }
+
+                _currentNode = _currentNode.Responses[command];
+
+                _state = State.Dialog;
+                _currentNodeInited = false;
+                return;
+            }
+        }
+    }
+
+    public class ExceptionNullNode : Exception
+    {
+        public ExceptionNullNode(string command) : base(String.Format("Node with key {0} is NULL", command))
+        {
         }
     }
 }

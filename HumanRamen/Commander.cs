@@ -21,7 +21,6 @@ namespace HumanRamen
             }
 
             _topicHandlers[topic].Add(handler);
-
         }
 
         public void Command(string topic, string command)

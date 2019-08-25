@@ -12,6 +12,7 @@ namespace InfinityDialogue.Systems
 {
     public class ControlSystem : UpdateSystem
     {
+        private readonly Logger _l = new Logger("ControlSystem");
         private readonly string _topic = "Control";
 
         private Commander _commander;
@@ -50,6 +51,7 @@ namespace InfinityDialogue.Systems
             {
                 if (kbd.WasKeyJustDown(m.Key))
                 {
+                    _l.Debug(String.Format("{0}: {1}", _topic, m.Value));
                     _commander.Command(_topic, m.Value);
                 }
             });
